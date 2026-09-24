@@ -1,0 +1,39 @@
+name: 성격지문 자동 회귀검수
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/regression.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/regression.yml'
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: npm install --no-save playwright@1.63.0
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+      - name: Start local server
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/pf-http.log 2>&1 &
+          echo $! > /tmp/pf-http.pid
+          sleep 1
+      - name: Run 192-question regression
+        env:
+          PF_BASE_URL: http://127.0.0.1:4173/
+        run: node tests/regression.mjs
