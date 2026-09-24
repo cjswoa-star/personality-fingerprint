@@ -238,7 +238,7 @@ details{border:1px solid var(--line);background:#fff;border-radius:16px;margin:1
 @media(max-width:620px){.dashTopbar{display:grid;grid-template-columns:1fr;gap:10px}.dashBrand{font-size:19px;white-space:nowrap}.dashActions{width:100%}.dashActions button{flex:1;min-width:0;white-space:nowrap}.inviteQR{justify-content:center}.inviteQRText{max-width:none;text-align:center}}
 
 </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=18195"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=18584"></script>
 </head>
 <body>
 <div class="wrap">
@@ -537,7 +537,7 @@ window.PF_FIREBASE_CONFIG = {
 };
 </script>
 <script>
-const APP_VERSION="2.5.2-FIREBASE-RECOVERY";
+const APP_VERSION="2.5.3-FIREBASE-REFRESH";
 const PROFILE_SCHEMA_VERSION=1;
 const PROGRESS_SCHEMA_VERSION=1;
 const LAST_SELF_KEY="pf_last_self_result_v1";
@@ -827,7 +827,7 @@ async function compareSelfOther(){try{let s=await loadJSON($('selfFile')),o=awai
 function updateObserverFileLabel(){let files=[...($('observerFiles')?.files||[])],el=$('observerFileLabel');if(!el)return;el.textContent=files.length?`${files.length}개 파일 선택됨 · ${files.slice(0,2).map(f=>f.name).join(', ')}${files.length>2?' 외 '+(files.length-2)+'개':''}`:'선택된 파일 없음 · 여러 개 선택 가능'}
 function loadQRCodeLib(){if(window.QRCode)return Promise.resolve(window.QRCode);if(qrLoadPromise)return qrLoadPromise;qrLoadPromise=new Promise((resolve,reject)=>{let done=false,sc=document.createElement('script'),timer=setTimeout(()=>{if(done)return;done=true;reject(Error('QR 라이브러리 응답 시간이 초과되었습니다.'))},5000);sc.src=QR_CODE_CDN;sc.async=true;sc.onload=()=>{if(done)return;done=true;clearTimeout(timer);window.QRCode?resolve(window.QRCode):reject(Error('QR 라이브러리를 불러오지 못했습니다.'))};sc.onerror=()=>{if(done)return;done=true;clearTimeout(timer);reject(Error('QR 라이브러리를 불러오지 못했습니다.'))};document.head.appendChild(sc)});return qrLoadPromise}
 async function renderInviteQR(text){let wrap=$('inviteQRWrap'),canvas=$('inviteQRCanvas'),msg=$('inviteQRText');if(!wrap||!canvas)return;wrap.classList.remove('hidden');canvas.style.display='block';if(msg)msg.textContent='QR 코드를 만드는 중입니다.';try{let QR=await loadQRCodeLib();await QR.toCanvas(canvas,text,{width:180,margin:1,errorCorrectionLevel:'M'});if(msg)msg.textContent='휴대전화 카메라로 QR 코드를 비추면 답변 화면을 열 수 있습니다.'}catch(e){canvas.style.display='none';if(msg)msg.textContent='QR 코드를 만들지 못했습니다. 위 링크를 복사해 보내주세요.'}}
-function openObserverHub(focusImport=false){if(!profile||profile.type!=='self'){goHomePanel('observerPanel');return}$('observerHub')?.classList.remove('hidden');updateRemoteStatus();initFirebaseBridge();renderObserverHubSummary();setTimeout(()=>{let el=focusImport?$('observerImportBox'):$('observerHub');el?.scrollIntoView({behavior:'smooth',block:'start'})},20)}
+async function openObserverHub(focusImport=false){if(!profile||profile.type!=='self'){goHomePanel('observerPanel');return}$('observerHub')?.classList.remove('hidden');updateRemoteStatus();await initFirebaseBridge();if(focusImport)await loadRemoteObservers();renderObserverHubSummary();setTimeout(()=>{let el=focusImport?$('observerImportBox'):$('observerHub');el?.scrollIntoView({behavior:'smooth',block:'start'})},20)}
 function closeObserverHub(){$('observerHub')?.classList.add('hidden')}
 async function ensureRemoteSelf(){let bridge=await initFirebaseBridge();if(!bridge.ready)return false;let uid=bridge.auth.currentUser?.uid;if(!uid)throw Error('Firebase 익명 로그인 상태를 확인할 수 없습니다.');profile.profileId=profile.profileId||randomId('pf');profile._sync=profile._sync||{inviteToken:randomToken()};profile._sync.inviteToken=profile._sync.inviteToken||randomToken();let {doc,setDoc,serverTimestamp}=bridge.api;let publicSelf=exportObj(false);delete publicSelf._sync;await setDoc(doc(bridge.db,'profiles',profile.profileId),{ownerUid:uid,targetName:profile.name,appVersion:APP_VERSION,updatedAt:serverTimestamp()},{merge:true});await setDoc(doc(bridge.db,'profiles',profile.profileId,'self','result'),{...publicSelf,ownerUid:uid,updatedAt:serverTimestamp()},{merge:true});await setDoc(doc(bridge.db,'invites',profile.profileId),{ownerUid:uid,targetName:profile.name,inviteToken:profile._sync.inviteToken,active:true,appVersion:APP_VERSION,updatedAt:serverTimestamp()},{merge:true});saveLastSelfResult();return true}
 async function makeObserverInvite(){if(!profile||profile.type!=='self')return;let remote=false;try{remote=await ensureRemoteSelf()}catch(e){REMOTE_BRIDGE.error=e?.message||String(e);updateRemoteStatus()}let u=currentBaseURL();u.searchParams.set('observe','1');u.searchParams.set('target',profile.name);if(remote){u.searchParams.set('pid',profile.profileId);u.searchParams.set('token',profile._sync.inviteToken)}let v=u.toString();$('inviteLinkValue').value=v;$('inviteLinkWrap').classList.remove('hidden');renderInviteQR(v);$('inviteLinkNote').innerHTML=remote?'<strong>자동 연결용 링크입니다.</strong> 답변이 저장되면 이 결과 화면에서 불러올 수 있습니다.':'<strong>현재는 설문을 여는 링크만 만들어졌습니다.</strong> Firebase 프로젝트 설정이 아직 없어 자동 수집은 되지 않습니다. 답변자는 완료 후 결과 파일을 보내야 합니다.'}
