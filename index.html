@@ -238,7 +238,7 @@ details{border:1px solid var(--line);background:#fff;border-radius:16px;margin:1
 @media(max-width:620px){.dashTopbar{display:grid;grid-template-columns:1fr;gap:10px}.dashBrand{font-size:19px;white-space:nowrap}.dashActions{width:100%}.dashActions button{flex:1;min-width:0;white-space:nowrap}.inviteQR{justify-content:center}.inviteQRText{max-width:none;text-align:center}}
 
 </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=14550"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=15961"></script>
 </head>
 <body>
 <div class="wrap">
@@ -526,10 +526,17 @@ details{border:1px solid var(--line);background:#fff;border-radius:16px;margin:1
 </div>
 <script>
 /* FIREBASE_CONFIG_SLOT — 실제 설정값을 받으면 null 한 줄만 Firebase 설정 객체로 교체합니다. */
-window.PF_FIREBASE_CONFIG = null;
+window.PF_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC2BRa8FL44_aw16-Q_CVjz2LtVjkQrkAk",
+  authDomain: "personality-fingerprint.firebaseapp.com",
+  projectId: "personality-fingerprint",
+  storageBucket: "personality-fingerprint.firebasestorage.app",
+  messagingSenderId: "314277710031",
+  appId: "1:314277710031:web:e6cbaa149c741886a10fba"
+};
 </script>
 <script>
-const APP_VERSION="2.5.0-FIREBASE-SECURE-BRIDGE";
+const APP_VERSION="2.5.1-FIREBASE-CONNECTED";
 const PROFILE_SCHEMA_VERSION=1;
 const PROGRESS_SCHEMA_VERSION=1;
 const LEGACY_PROFILE_MESSAGE="이 결과는 이전 응답방식으로 작성되어 현재 버전과 직접 비교하지 않습니다. 새 검사 재실시를 권장합니다.";
